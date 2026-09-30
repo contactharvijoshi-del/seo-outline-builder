@@ -1,0 +1,12 @@
+{
+  "name": "seo-outline-builder",
+  "version": "1.0.0",
+  "description": "Keyword to SEO content brief — Gemini with Google Search grounding + optional DataForSEO data",
+  "type": "module",
+  "main": "server.js",
+  "engines": { "node": ">=22.9" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "demo": "node server.js --demo"
+  }
+}

@@ -1,0 +1,21 @@
+# Render Blueprint: New → Blueprint → pick this repo. Render will ask for GEMINI_API_KEY.
+services:
+  - type: web
+    name: seo-outline-builder
+    runtime: node
+    region: singapore
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: APP_ACCESS_TOKEN
+        generateValue: true
+      - key: GEMINI_MODEL
+        value: gemini-3.8-flash
+      - key: GEMINI_SEARCH_GROUNDING
+        value: "true"
+      - key: NODE_VERSION
+        value: "24"
