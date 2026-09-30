@@ -7,11 +7,11 @@ import { timingSafeEqual } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { generateBrief } from './lib/gemini.js';
-import { getSerp, getKeywordMetrics } from './lib/dataforseo.js';
-import { makeCache } from './lib/cache.js';
-import { buildPrompt } from './lib/prompt.js';
-import { mockBrief } from './lib/mock.js';
+import { generateBrief } from './gemini.js';
+import { getSerp, getKeywordMetrics } from './dataforseo.js';
+import { makeCache } from './cache.js';
+import { buildPrompt } from './prompt.js';
+import { mockBrief } from './mock.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const env = process.env;
@@ -163,7 +163,7 @@ const server = http.createServer(async (req, res) => {
 
   try {
     if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/index.html')) {
-      return send(res, 200, await readFile(path.join(__dirname, 'public', 'index.html'), 'utf8'), 'text/html; charset=utf-8');
+      return send(res, 200, await readFile(path.join(__dirname, 'index.html'), 'utf8'), 'text/html; charset=utf-8');
     }
     if (req.method === 'GET' && url.pathname === '/api/health') {
       return send(res, 200, { ok: true });
