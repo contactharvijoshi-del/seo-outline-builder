@@ -1,41 +1,42 @@
-// Sample output for MOCK_MODE=true — lets you demo the UI with no API keys and no cost.
-export function mockBrief(keyword) {
+// Sample output for MOCK_MODE=true / --demo — lets you try the UI with no API keys and no cost.
+export function mockBrief(o) {
+  const k = o.keyword;
+  const parts = ['What is', 'How it works:', 'Key benefits of', 'Choosing the right', 'Common mistakes with', 'Costs and budgeting for', 'Expert tips for', 'Getting started with', 'Alternatives to', 'The future of'];
+  const per = Math.round(Number(o.length.split('-')[0]) / o.h2Count) || 200;
   return {
     brief: {
-      keyword,
-      searchIntent: 'informational',
-      intentExplanation: 'Searchers want a practical explanation and examples before choosing an option.',
-      targetAudience: 'Small-business owners and marketers researching the topic for the first time.',
-      titleOptions: [
-        `${keyword}: The Complete Guide (2026)`,
-        `What Is ${keyword}? Examples, Tips & Mistakes`,
-        `${keyword} Explained in Plain English`,
-      ],
-      metaDescription: `Everything you need to know about ${keyword} — how it works, real examples, common mistakes and a step-by-step plan to get started today.`,
-      slug: keyword.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-      recommendedWordCount: 1800,
-      primaryKeyword: keyword,
-      secondaryKeywords: [`${keyword} examples`, `${keyword} tips`, `best ${keyword}`, `${keyword} for beginners`, `${keyword} cost`, `how does ${keyword} work`, `${keyword} checklist`, `${keyword} tools`],
-      outline: [
-        { h2: `What is ${keyword}?`, notes: 'Define it in 2-3 sentences for a featured-snippet answer.', h3: ['Simple definition', 'Why it matters in 2026'] },
-        { h2: `How ${keyword} works`, notes: 'Walk through the process step by step with a diagram.', h3: ['Step 1: Plan', 'Step 2: Execute', 'Step 3: Measure'] },
-        { h2: `Real-world examples of ${keyword}`, notes: 'Use 3 short case studies with numbers.', h3: ['Example: small business', 'Example: enterprise'] },
-        { h2: 'Common mistakes to avoid', notes: 'Top pages skip this — a clear content gap.', h3: [] },
-        { h2: `Getting started with ${keyword}`, notes: 'Actionable checklist with a downloadable template.', h3: ['Checklist', 'Recommended tools'] },
-      ],
+      keyword: k,
+      searchIntent: o.intent === 'auto' ? 'commercial' : o.intent,
+      intentExplanation: 'Searchers are comparing options before buying, so the page should guide a decision.',
+      targetAudience: o.audience || 'First-time buyers researching options',
+      articleType: o.articleType,
+      titleOptions: [`${k}: The Complete Guide (2026)`, `${k} — Expert Picks & Buying Tips`, `How to Choose the Best ${k}`],
+      metaDescription: `Everything you need to know about ${k}: how it works, what to look for, common mistakes and expert tips to choose with confidence.`,
+      slug: k.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      recommendedWordCount: Number(o.length.split('-')[1]) - 100,
+      primaryKeyword: k,
+      secondaryKeywords: [`best ${k}`, `${k} for beginners`, `${k} price`, `${k} reviews`, `how to choose ${k}`, `${k} vs alternatives`, `${k} tips`, `${k} buying guide`],
+      outline: Array.from({ length: o.h2Count }, (_, i) => ({
+        h2: `${parts[i % parts.length]} ${k}`,
+        notes: 'Sample notes — real briefs explain what to cover and why.',
+        h3: ['Key point', 'Example'],
+        wordCount: per,
+      })),
       faqs: [
-        { question: `Is ${keyword} worth it?`, answerHint: 'Yes for most businesses; explain ROI with an example.' },
-        { question: `How much does ${keyword} cost?`, answerHint: 'Give price ranges and what drives cost.' },
-        { question: `How long does ${keyword} take to show results?`, answerHint: 'Typical timeline and influencing factors.' },
+        { question: `Is ${k} worth it?`, answerHint: 'Yes for most people — explain value with an example.' },
+        { question: `How much does ${k} cost?`, answerHint: 'Give price ranges and what drives cost.' },
+        { question: `What should beginners look for in ${k}?`, answerHint: 'List 3–4 must-have features.' },
       ],
-      competitorInsights: ['Top results use clear definitions near the top', 'Most include a comparison table', 'Strong pages show original data'],
-      contentGaps: ['No page covers common mistakes in depth', 'Few give a downloadable checklist', 'Australian-specific examples are missing'],
-      internalLinkIdeas: ['Link to your pricing page', 'Link to a related how-to guide', 'Link to a case study'],
+      competitorInsights: ['Top pages lead with a quick-answer summary', 'Most include a comparison table', 'Strong pages show hands-on testing'],
+      contentGaps: ['Few cover total cost of ownership', 'No page has a beginner checklist', 'Local (Australian) pricing is missing'],
+      ctaPlacement: o.cta ? `Place "${o.cta}" after the comparison section and again in the conclusion.` : 'Add a soft CTA after the buying-guide section.',
+      internalLinkIdeas: ['Link to your product category page', 'Link to a related how-to guide', 'Link to a case study'],
       schemaTypes: ['Article', 'FAQPage'],
-      writerNotes: 'Sample output from MOCK_MODE — set GEMINI_API_KEY for real briefs.',
+      writerNotes: 'Sample output from demo mode — connect a Gemini key with billing for real briefs.',
     },
     sources: [{ title: 'example.com', url: 'https://example.com' }],
-    searchQueries: [keyword],
+    searchQueries: [k],
     usage: null,
+    model: 'mock',
   };
 }

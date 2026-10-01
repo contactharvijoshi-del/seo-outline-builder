@@ -49,12 +49,27 @@ Headers: Content-Type: application/json, x-access-token: <APP_ACCESS_TOKEN>
 Body:    { "keyword": "boutique hotels brisbane", "country": "AU", "language": "en", "refresh": false }
 ```
 
-Countries: AU, US, GB, CA, NZ, IN. To add more, edit `COUNTRIES` in `server.js` using DataForSEO location codes.
+Body also accepts: audience, intent, articleType, length, h2Count, brand, cta, competitorUrls, instructions. Countries/languages are listed by `GET /api/config`.
 
-## Files
+## Brief options (same as the original AI Studio tool)
 
-- `server.js`: web server, auth, rate limit, cache, orchestration
-- `lib/gemini.js`: Gemini + Google Search grounding
-- `lib/dataforseo.js`: SERP and keyword metrics
-- `lib/prompt.js`: the brief prompt and output shape (edit it to change what the brief contains)
-- `public/index.html`: the app UI
+Target keyword · Country/market (incl. Global) · Language · Target audience · Search intent (auto-detect or manual) ·
+Article type (Ultimate Guide, How-to, Listicle, Comparison, Review, Beginner Guide, Case Study) · Desired length ·
+Number of H2 sections · Brand/website · Primary CTA · Competitor URLs (up to 5 — the server reads each page's
+title, meta description, H1–H3 headings and word count) · Additional instructions · Coffee-machine demo · Reset.
+
+## Reliability
+
+- Busy errors from Google (503) are retried automatically (2s, 4s, 8s).
+- Optional `GEMINI_FALLBACK_MODEL`: a second Gemini model name (from AI Studio's model list) used automatically when the main model is busy.
+- Quota errors are reported immediately with a clear message (they mean the key needs billing).
+
+## Files (all in one folder)
+
+- `server.js` — web server, auth, rate limit, cache, orchestration
+- `gemini.js` — Gemini + Google Search grounding, retries, backup model
+- `competitors.js` — reads competitor pages
+- `dataforseo.js` — SERP and keyword metrics
+- `prompt.js` — the brief prompt, article types and lengths
+- `index.html` — the app UI
+- `cache.js`, `http.js`, `mock.js` — helpers and demo data

@@ -6,217 +6,354 @@
 <title>SEO Outline Builder</title>
 <style>
   :root {
-    --bg: #f6f7f9; --card: #fff; --ink: #1a1d23; --muted: #5f6673; --line: #e3e6eb;
-    --accent: #2f5bea; --accent-ink: #fff; --warn-bg: #fff6e0; --warn-ink: #7a5500; --err-bg: #fdecec; --err-ink: #a11d1d;
+    --bg: #f4f6f9; --card: #fff; --card2: #f8fafc; --ink: #1a1d23; --muted: #64707f; --line: #e2e7ee;
+    --accent: #2563eb; --accent-soft: #eef4ff; --accent-line: #bcd0fb; --accent-ink: #fff;
+    --warn-bg: #fff6e0; --warn-ink: #7a5500; --err-bg: #fdecec; --err-ink: #a11d1d; --req: #dc2626;
   }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #111318; --card: #1a1d24; --ink: #e8eaee; --muted: #9aa2b1; --line: #2b303a;
-      --accent: #6d8dff; --accent-ink: #0d1020; --warn-bg: #3a2f10; --warn-ink: #f3d68a; --err-bg: #3b1616; --err-ink: #ffb3b3; }
+    :root { --bg: #0f1116; --card: #181b22; --card2: #1d2129; --ink: #e8eaee; --muted: #9aa3b2; --line: #2b303a;
+      --accent: #6d8dff; --accent-soft: #1b2440; --accent-line: #34467a; --accent-ink: #0d1020;
+      --warn-bg: #3a2f10; --warn-ink: #f3d68a; --err-bg: #3b1616; --err-ink: #ffb3b3; --req: #ff8a8a; }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--ink); }
-  main { max-width: 960px; margin: 0 auto; padding: 32px 16px 64px; }
-  h1 { font-size: 26px; margin: 0 0 4px; }
-  .sub { color: var(--muted); margin: 0 0 24px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
-  form { display: grid; grid-template-columns: 1fr 170px auto; gap: 10px; }
-  input, select, button { font: inherit; border-radius: 8px; border: 1px solid var(--line); padding: 10px 12px; background: var(--card); color: var(--ink); }
-  input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
-  button { cursor: pointer; }
-  .primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
-  .primary:disabled { opacity: .6; cursor: wait; }
-  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  .token { margin-top: 10px; display: none; }
-  .token input { width: 100%; }
-  .status { font-size: 13px; color: var(--muted); margin-top: 10px; }
-  .pill { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); }
+  body { margin: 0; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--ink); }
+  header { max-width: 1320px; margin: 0 auto; padding: 24px 16px 8px; }
+  header h1 { font-size: 24px; margin: 0; }
+  header p { margin: 4px 0 0; color: var(--muted); }
+  main { max-width: 1320px; margin: 0 auto; padding: 16px 16px 64px; display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+  .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 14px 20px; background: var(--card2); border-bottom: 1px solid var(--line); }
+  .panel-head b { letter-spacing: .04em; display: flex; align-items: center; gap: 10px; font-size: 16px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); display: inline-block; }
+  .linkbtn { background: none; border: 0; color: var(--accent); font: inherit; font-weight: 500; cursor: pointer; padding: 4px; }
+  .form { padding: 18px 20px 22px; display: grid; gap: 16px; }
+  .field label, .lab { display: flex; align-items: center; gap: 6px; font-weight: 600; margin-bottom: 6px; }
+  .lab small, .field label small { font-weight: 400; color: var(--muted); }
+  .lab .right, .field label .right { margin-left: auto; font-weight: 400; color: var(--muted); font-size: 13px; }
+  .req { color: var(--req); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  input, select, textarea { width: 100%; font: inherit; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  textarea { resize: vertical; min-height: 74px; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .types { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .type { text-align: left; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--card); color: var(--ink); cursor: pointer; font: inherit; }
+  .type b { display: block; font-size: 14.5px; }
+  .type span { display: block; color: var(--muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .type[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--accent-soft); padding: 9px 11px; }
+  .type[aria-pressed="true"] b { color: var(--accent); }
+  .research { border: 1px solid var(--accent-line); background: var(--accent-soft); border-radius: 12px; padding: 12px 14px; font-size: 14px; }
+  .research.off { border-color: var(--line); background: var(--card2); color: var(--muted); }
+  .go { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 12px; padding: 14px; font: inherit; font-weight: 700; font-size: 16px; letter-spacing: .03em; cursor: pointer; width: 100%; }
+  .go:disabled { opacity: .65; cursor: wait; }
+  .reset { justify-self: center; background: none; border: 0; color: var(--muted); font: inherit; font-weight: 600; letter-spacing: .05em; cursor: pointer; }
+  .token { display: none; }
+  main > *, .form > *, .row2 > *, .types > *, .field, .grid2 > * { min-width: 0; }
+  select { text-overflow: ellipsis; }
+  .lab, .field label { flex-wrap: wrap; }
+
+  .out { min-height: 300px; }
+  .out-body { padding: 18px 20px 24px; }
+  .empty { text-align: center; color: var(--muted); padding: 70px 20px; }
+  .empty b { display: block; color: var(--ink); font-size: 17px; margin-bottom: 4px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pill { font-size: 12px; padding: 2px 9px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); }
   .pill.on { border-color: var(--accent); color: var(--accent); }
-  .notice { padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; }
+  .notice { padding: 10px 14px; border-radius: 10px; margin-bottom: 12px; font-size: 14px; }
   .warn { background: var(--warn-bg); color: var(--warn-ink); }
   .error { background: var(--err-bg); color: var(--err-ink); }
-  h2 { font-size: 17px; margin: 0 0 12px; }
-  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 6px; }
+  .actions button { font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 9px; padding: 7px 12px; cursor: pointer; }
+  .meta { font-size: 13px; color: var(--muted); }
+  section.block { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 16px; }
+  section.block h3 { font-size: 16px; margin: 0 0 10px; }
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
   .metric { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
-  .metric b { display: block; font-size: 20px; }
-  .metric span { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
-  ol.outline { padding-left: 20px; margin: 0; }
+  .metric b { display: block; font-size: 18px; }
+  .metric span { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  ol.outline { padding-left: 22px; margin: 0; }
   ol.outline > li { margin-bottom: 12px; }
-  ol.outline > li > strong { font-size: 15.5px; }
   .notes { color: var(--muted); font-size: 14px; }
   ul { margin: 6px 0 0; padding-left: 20px; }
   .tags { display: flex; flex-wrap: wrap; gap: 6px; }
-  .tag { background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; font-size: 13px; }
+  .tag { background: var(--card2); border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; font-size: 13px; }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .grid2 .card { margin: 0; }
+  @media (max-width: 640px) { .grid2, .row2 { grid-template-columns: 1fr; } }
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
   td, th { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 13px; }
   a { color: var(--accent); word-break: break-word; }
-  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: -2px; }
+  .spinner { display: inline-block; width: 15px; height: 15px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: -2px; margin-right: 6px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  #results { display: none; }
-  @media (max-width: 640px) { form { grid-template-columns: 1fr; } .grid2 { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
-<main>
+<header>
   <h1>SEO Outline Builder</h1>
-  <p class="sub">Enter a target keyword and generate a complete, search-focused SEO content brief before a word is written.</p>
+  <p>Enter a target keyword and generate a complete, search-focused SEO content brief before a word is written.</p>
+</header>
 
-  <div class="card">
-    <form id="form">
-      <input id="keyword" placeholder="Target keyword, e.g. boutique hotels brisbane" required minlength="2" maxlength="120" autocomplete="off">
-      <select id="country" aria-label="Market"></select>
-      <button class="primary" id="go" type="submit">Generate brief</button>
-    </form>
-    <div class="token" id="tokenWrap">
-      <input id="token" type="password" placeholder="Company access token" autocomplete="off">
+<main>
+  <!-- ===== Brief form ===== -->
+  <div class="panel">
+    <div class="panel-head">
+      <b><span class="dot"></span>BRIEF</b>
+      <button class="linkbtn" id="demo" type="button">✦ Load Coffee Machine Demo</button>
     </div>
-    <div class="status row" id="status"></div>
+    <form class="form" id="form" novalidate>
+      <div class="field">
+        <label for="keyword">Target Keyword <span class="req">*</span><span class="right">Primary search query</span></label>
+        <input id="keyword" placeholder="e.g. best espresso machine" maxlength="120" autocomplete="off" required>
+      </div>
+
+      <div class="row2">
+        <div class="field"><label for="country">🌐 Country / Market</label><select id="country"></select></div>
+        <div class="field"><label for="language">文A Language</label><select id="language"></select></div>
+      </div>
+
+      <div class="field">
+        <label for="audience">👥 Target Audience</label>
+        <input id="audience" placeholder="e.g. first-time buyers" maxlength="200">
+      </div>
+
+      <div class="field">
+        <label for="intent">◎ Search Intent</label>
+        <select id="intent">
+          <option value="auto">Auto Detect (AI will analyze SERP &amp; semantics)</option>
+          <option value="informational">Informational</option>
+          <option value="commercial">Commercial investigation</option>
+          <option value="transactional">Transactional</option>
+          <option value="navigational">Navigational</option>
+        </select>
+      </div>
+
+      <div>
+        <div class="lab">▤ Article Type</div>
+        <div class="types" id="types" role="group" aria-label="Article type"></div>
+      </div>
+
+      <div class="row2">
+        <div class="field"><label for="length">Desired Length (Words)</label><select id="length"></select></div>
+        <div class="field"><label for="h2Count">Number of H2 Sections</label><select id="h2Count"></select></div>
+      </div>
+
+      <div class="row2">
+        <div class="field"><label for="brand">Brand / Website <small>(Optional)</small></label><input id="brand" placeholder="e.g. BrewMaster Co." maxlength="120"></div>
+        <div class="field"><label for="cta">Primary CTA <small>(Optional)</small></label><input id="cta" placeholder="e.g. Book a consultation" maxlength="120"></div>
+      </div>
+
+      <div class="field">
+        <label for="competitors">🔗 Competitor URLs (Up to 5)<span class="right">Optional — one per line</span></label>
+        <textarea id="competitors" rows="3" placeholder="https://example.com/best-coffee-makers&#10;https://competitor.com/home-espresso-guide"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="instructions">💬 Additional Instructions</label>
+        <textarea id="instructions" rows="3" maxlength="1500" placeholder="e.g. Focus on beginners and keep the article practical."></textarea>
+      </div>
+
+      <div class="field token" id="tokenWrap">
+        <label for="token">🔒 Company Access Token</label>
+        <input id="token" type="password" autocomplete="off" placeholder="Enter the access password">
+      </div>
+
+      <div class="research" id="research"></div>
+
+      <button class="go" id="go" type="submit">✦ BUILD SEO OUTLINE</button>
+      <button class="reset" id="reset" type="button">↺ RESET</button>
+    </form>
   </div>
 
-  <div id="messages"></div>
-
-  <section id="results">
-    <div class="card">
-      <div class="row" style="justify-content:space-between">
-        <h2 id="rTitle" style="margin:0"></h2>
-        <div class="row">
+  <!-- ===== Output ===== -->
+  <div class="panel out">
+    <div class="panel-head">
+      <b><span class="dot"></span>OUTLINE</b>
+      <div class="pills" id="pills"></div>
+    </div>
+    <div class="out-body">
+      <div id="messages"></div>
+      <div id="empty" class="empty"><b>Your SEO outline will appear here</b>Fill in the brief and click “Build SEO Outline”. It takes about 15–40 seconds.</div>
+      <div id="result" hidden>
+        <div class="actions">
           <button id="copyMd" type="button">Copy as Markdown</button>
           <button id="dlMd" type="button">Download .md</button>
           <button id="dlJson" type="button">Download JSON</button>
           <button id="refresh" type="button" title="Ignore cache and regenerate">Regenerate</button>
         </div>
+        <div class="meta" id="rMeta"></div>
+        <div id="rBody"></div>
       </div>
-      <div class="status" id="rMeta"></div>
     </div>
-    <div id="rBody"></div>
-  </section>
+  </div>
 </main>
 
 <script>
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-let last = null;
-let authRequired = false;
+const store = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} };
+const load = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
 
-function store(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} }
-function load(k) { try { return localStorage.getItem(k); } catch { return null; } }
+const TYPE_DESC = {
+  ultimate: 'Deep end-to-end topical coverage', howto: 'Actionable step-by-step instructions',
+  listicle: 'Scannable ranked items', comparison: 'Side-by-side vs breakdown',
+  review: 'In-depth product or tool review', beginner: 'Fundamental overview for newcomers',
+  casestudy: 'Real-world data & results',
+};
+const DEFAULTS = { keyword: '', country: 'GLOBAL', language: 'en', audience: '', intent: 'auto', articleType: 'ultimate', length: '800-1200', h2Count: '5', brand: '', cta: '', competitors: '', instructions: '' };
+const DEMO = {
+  keyword: 'best coffee machine for home', country: 'AU', language: 'en',
+  audience: 'first-time buyers upgrading from pod machines', intent: 'commercial', articleType: 'comparison',
+  length: '1800-2500', h2Count: '6', brand: 'BrewMaster Co.', cta: 'Shop the BrewMaster espresso range',
+  competitors: '', instructions: 'Focus on beginners and keep the article practical. Include a budget vs premium section and Australian pricing.',
+};
+let articleType = 'ultimate';
+let authRequired = false;
+let last = null;
+
+function setType(t) {
+  articleType = t;
+  document.querySelectorAll('.type').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.type === t)));
+}
+function fill(v) {
+  for (const k of ['keyword', 'country', 'language', 'audience', 'intent', 'length', 'h2Count', 'brand', 'cta', 'competitors', 'instructions']) $(k).value = v[k];
+  setType(v.articleType);
+}
 
 async function init() {
-  try {
-    const cfg = await (await fetch('/api/config')).json();
-    $('country').innerHTML = Object.entries(cfg.countries).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join('');
-    $('country').value = load('country') || 'AU';
-    authRequired = cfg.authRequired;
-    if (authRequired) { $('tokenWrap').style.display = 'block'; $('token').value = load('token') || ''; }
-    $('status').innerHTML = [
-      cfg.mock ? '<span class="pill">Mock mode</span>' : `<span class="pill on">AI: ${esc(cfg.model)}</span>`,
-      `<span class="pill ${cfg.searchGrounding && !cfg.mock ? 'on' : ''}">Google Search grounding ${cfg.searchGrounding && !cfg.mock ? 'on' : 'off'}</span>`,
-      `<span class="pill ${cfg.dataforseo ? 'on' : ''}">DataForSEO ${cfg.dataforseo ? 'on' : 'off'}</span>`,
-    ].join(' ');
-  } catch {
-    showMsg('error', 'Could not reach the server.');
-  }
+  let cfg;
+  try { cfg = await (await fetch('/api/config')).json(); } catch { return showMsg('error', 'Could not reach the server. Please refresh the page.'); }
+  $('country').innerHTML = Object.entries(cfg.countries).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join('');
+  $('language').innerHTML = Object.entries(cfg.languages).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join('');
+  $('length').innerHTML = Object.entries(cfg.lengths).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join('');
+  $('h2Count').innerHTML = Array.from({ length: 10 }, (_, i) => i + 3).map((n) => `<option value="${n}">${n} Main Sections</option>`).join('');
+  $('types').innerHTML = Object.entries(cfg.articleTypes).map(([k, v]) =>
+    `<button type="button" class="type" data-type="${k}" aria-pressed="false"><b>${esc(v)}</b><span>${esc(TYPE_DESC[k] || '')}</span></button>`).join('');
+  $('types').addEventListener('click', (e) => { const b = e.target.closest('.type'); if (b) setType(b.dataset.type); });
+  fill(DEFAULTS);
+
+  authRequired = cfg.authRequired;
+  if (authRequired) { $('tokenWrap').style.display = 'block'; $('token').value = load('token') || ''; }
+  $('research').className = 'research' + (cfg.searchGrounding ? '' : ' off');
+  $('research').innerHTML = cfg.mock
+    ? '<b>Demo Mode:</b> sample outlines only — no AI is used.'
+    : cfg.searchGrounding
+      ? '✦ <b>Research Mode Enabled:</b> live Google Search grounding will be applied to incorporate authoritative topics and current terminology.'
+      : '<b>Research Mode Off:</b> outlines use the AI model’s own knowledge (live search grounding is turned off on the server).';
+  $('pills').innerHTML = [
+    `<span class="pill on">AI: ${esc(cfg.model)}</span>`,
+    `<span class="pill ${cfg.searchGrounding ? 'on' : ''}">Live search ${cfg.searchGrounding ? 'on' : 'off'}</span>`,
+    `<span class="pill ${cfg.dataforseo ? 'on' : ''}">DataForSEO ${cfg.dataforseo ? 'on' : 'off'}</span>`,
+  ].join('');
 }
 
-function showMsg(kind, text) {
-  $('messages').insertAdjacentHTML('beforeend', `<div class="notice ${kind}">${esc(text)}</div>`);
-}
+function showMsg(kind, text) { $('messages').insertAdjacentHTML('beforeend', `<div class="notice ${kind}">${esc(text)}</div>`); }
 
 async function run(refresh = false) {
-  const keyword = $('keyword').value.trim();
-  if (keyword.length < 2) return;
-  store('country', $('country').value);
-  if (authRequired) store('token', $('token').value);
-
   $('messages').innerHTML = '';
+  const keyword = $('keyword').value.trim();
+  if (keyword.length < 2) { $('keyword').focus(); return showMsg('error', 'Please enter a target keyword.'); }
+  if (authRequired) store('token', $('token').value.trim());
+
   $('go').disabled = $('refresh').disabled = true;
-  $('go').innerHTML = '<span class="spinner"></span> Researching…';
+  $('go').innerHTML = '<span class="spinner"></span>RESEARCHING &amp; BUILDING…';
   try {
     const res = await fetch('/api/brief', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-access-token': $('token').value || '' },
-      body: JSON.stringify({ keyword, country: $('country').value, language: 'en', refresh }),
+      headers: { 'Content-Type': 'application/json', 'x-access-token': $('token').value.trim() },
+      body: JSON.stringify({
+        keyword, country: $('country').value, language: $('language').value, audience: $('audience').value,
+        intent: $('intent').value, articleType, length: $('length').value, h2Count: Number($('h2Count').value),
+        brand: $('brand').value, cta: $('cta').value, competitorUrls: $('competitors').value,
+        instructions: $('instructions').value, refresh,
+      }),
     });
-    const data = await res.json();
+    let data;
+    try { data = await res.json(); } catch { throw new Error(`The server took too long or failed (${res.status}). Please try again.`); }
     if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
     last = data;
     (data.warnings || []).forEach((w) => showMsg('warn', w));
     render(data);
   } catch (e) {
-    showMsg('error', e.message);
+    showMsg('error', e.message === 'Failed to fetch' ? 'Could not reach the server. Check your connection and try again.' : e.message);
   } finally {
     $('go').disabled = $('refresh').disabled = false;
-    $('go').textContent = 'Generate brief';
+    $('go').textContent = '✦ BUILD SEO OUTLINE';
   }
 }
 
-function list(items) { return items?.length ? `<ul>${items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>` : '<p class="notes">—</p>'; }
-function fmt(n) { return n == null ? '—' : typeof n === 'number' ? n.toLocaleString() : esc(n); }
+const list = (a) => a?.length ? `<ul>${a.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>` : '<p class="notes">—</p>';
+const fmt = (n) => n == null ? '—' : typeof n === 'number' ? n.toLocaleString() : esc(n);
 
 function render(d) {
-  const b = d.brief || {};
-  const m = d.metrics;
-  const meta = d.meta || {};
-  $('rTitle').textContent = `Brief: ${meta.keyword || b.keyword}`;
-  $('rMeta').textContent = `${meta.country} · ${meta.model}${meta.searchGrounding ? ' + Google Search' : ''}${meta.dataforseo ? ' + DataForSEO' : ''} · ${meta.cached ? 'from cache' : 'fresh'} · ${new Date(meta.generatedAt).toLocaleString()}`;
+  const b = d.brief || {}, m = d.metrics, meta = d.meta || {};
+  $('empty').hidden = true; $('result').hidden = false;
+  $('rMeta').textContent = [meta.keyword, meta.countryName, meta.languageName, meta.articleTypeName, meta.lengthName,
+    `${meta.model}${meta.searchGrounding ? ' + live search' : ''}`, meta.cached ? 'from cache' : 'fresh',
+    new Date(meta.generatedAt).toLocaleString()].filter(Boolean).join(' · ');
 
-  let html = `<div class="card"><h2>Overview</h2><div class="metrics">
-      <div class="metric"><span>Intent</span><b>${esc(b.searchIntent || m?.intent || '—')}</b></div>
-      <div class="metric"><span>Target length</span><b>${fmt(b.recommendedWordCount)} words</b></div>
-      ${m ? `<div class="metric"><span>Monthly searches</span><b>${fmt(m.searchVolume)}</b></div>
-      <div class="metric"><span>Difficulty</span><b>${fmt(m.difficulty)}${m.difficulty != null ? '/100' : ''}</b></div>
-      <div class="metric"><span>CPC</span><b>${m.cpc != null ? '$' + Number(m.cpc).toFixed(2) : '—'}</b></div>` : ''}
-    </div>
-    <p>${esc(b.intentExplanation)}</p>
-    <p><strong>Audience:</strong> ${esc(b.targetAudience)}</p></div>`;
+  let h = `<section class="block"><h3>Overview</h3><div class="metrics">
+    <div class="metric"><span>Intent</span><b>${esc(b.searchIntent || m?.intent || '—')}</b></div>
+    <div class="metric"><span>Target length</span><b>${fmt(b.recommendedWordCount)} words</b></div>
+    <div class="metric"><span>H2 sections</span><b>${(b.outline || []).length}</b></div>
+    ${m ? `<div class="metric"><span>Monthly searches</span><b>${fmt(m.searchVolume)}</b></div>
+    <div class="metric"><span>Difficulty</span><b>${fmt(m.difficulty)}${m.difficulty != null ? '/100' : ''}</b></div>` : ''}
+    </div><p>${esc(b.intentExplanation)}</p><p><b>Audience:</b> ${esc(b.targetAudience)}</p></section>`;
 
-  html += `<div class="card"><h2>Title & meta</h2>
-    <table><tr><th>Title options</th><td>${list(b.titleOptions)}</td></tr>
+  h += `<section class="block"><h3>Title & meta</h3><table>
+    <tr><th>Title options</th><td>${list(b.titleOptions)}</td></tr>
     <tr><th>Meta description</th><td>${esc(b.metaDescription)} <span class="notes">(${(b.metaDescription || '').length} chars)</span></td></tr>
-    <tr><th>URL slug</th><td>/${esc(b.slug)}</td></tr></table></div>`;
+    <tr><th>URL slug</th><td>/${esc(b.slug)}</td></tr></table></section>`;
 
-  html += `<div class="card"><h2>Keywords</h2><p><strong>Primary:</strong> ${esc(b.primaryKeyword)}</p>
-    <div class="tags">${(b.secondaryKeywords || []).map((k) => `<span class="tag">${esc(k)}</span>`).join('')}</div></div>`;
+  h += `<section class="block"><h3>Keywords</h3><p><b>Primary:</b> ${esc(b.primaryKeyword)}</p>
+    <div class="tags">${(b.secondaryKeywords || []).map((k) => `<span class="tag">${esc(k)}</span>`).join('')}</div></section>`;
 
-  html += `<div class="card"><h2>Outline</h2><ol class="outline">${(b.outline || []).map((s) => `
-    <li><strong>H2: ${esc(s.h2)}</strong><div class="notes">${esc(s.notes)}</div>
-    ${s.h3?.length ? `<ul>${s.h3.map((h) => `<li>H3: ${esc(h)}</li>`).join('')}</ul>` : ''}</li>`).join('')}</ol></div>`;
+  h += `<section class="block"><h3>Outline</h3><ol class="outline">${(b.outline || []).map((s) => `
+    <li><b>H2: ${esc(s.h2)}</b>${s.wordCount ? ` <span class="notes">(~${fmt(s.wordCount)} words)</span>` : ''}
+    <div class="notes">${esc(s.notes)}</div>
+    ${s.h3?.length ? `<ul>${s.h3.map((x) => `<li>H3: ${esc(x)}</li>`).join('')}</ul>` : ''}</li>`).join('')}</ol></section>`;
 
-  html += `<div class="card"><h2>FAQs</h2>${(b.faqs || []).map((f) => `<p><strong>${esc(f.question)}</strong><br><span class="notes">${esc(f.answerHint)}</span></p>`).join('') || '—'}</div>`;
+  h += `<section class="block"><h3>FAQs</h3>${(b.faqs || []).map((f) => `<p><b>${esc(f.question)}</b><br><span class="notes">${esc(f.answerHint)}</span></p>`).join('') || '—'}</section>`;
 
-  html += `<div class="grid2">
-    <div class="card"><h2>What top pages do well</h2>${list(b.competitorInsights)}</div>
-    <div class="card"><h2>Content gaps to win on</h2>${list(b.contentGaps)}</div>
-    <div class="card"><h2>Internal link ideas</h2>${list(b.internalLinkIdeas)}</div>
-    <div class="card"><h2>Schema markup</h2>${list(b.schemaTypes)}</div></div>`;
+  if (b.ctaPlacement) h += `<section class="block"><h3>Call to action</h3><p>${esc(b.ctaPlacement)}</p></section>`;
 
-  if (b.writerNotes) html += `<div class="card" style="margin-top:16px"><h2>Notes for the writer</h2><p>${esc(b.writerNotes)}</p></div>`;
+  h += `<section class="block grid2">
+    <div><h3>What top pages do well</h3>${list(b.competitorInsights)}</div>
+    <div><h3>Content gaps to win on</h3>${list(b.contentGaps)}</div>
+    <div><h3>Internal link ideas</h3>${list(b.internalLinkIdeas)}</div>
+    <div><h3>Schema markup</h3>${list(b.schemaTypes)}</div></section>`;
 
+  if (b.writerNotes) h += `<section class="block"><h3>Notes for the writer</h3><p>${esc(b.writerNotes)}</p></section>`;
+
+  const comps = (d.competitors || []).filter((c) => !c.error);
+  if (comps.length) {
+    h += `<section class="block"><h3>Competitor pages analysed</h3><table><tr><th>Page</th><th>Headings</th><th>~Words</th></tr>
+      ${comps.map((c) => `<tr><td><a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.title || c.url)}</a></td><td>${c.headingCount}</td><td>${fmt(c.wordCount)}</td></tr>`).join('')}</table></section>`;
+  }
   if (d.serp?.topResults?.length) {
-    html += `<div class="card" style="margin-top:16px"><h2>Current Google top 10</h2><table>
-      ${d.serp.topResults.map((r) => `<tr><td>#${r.position}</td><td><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.title)}</a><div class="notes">${esc(r.domain)}</div></td></tr>`).join('')}
-      </table>${d.serp.peopleAlsoAsk?.length ? `<h2 style="margin-top:16px">People also ask</h2>${list(d.serp.peopleAlsoAsk)}` : ''}</div>`;
+    h += `<section class="block"><h3>Current Google top 10</h3><table>
+      ${d.serp.topResults.map((r) => `<tr><td>#${r.position}</td><td><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.title)}</a><div class="notes">${esc(r.domain)}</div></td></tr>`).join('')}</table></section>`;
   }
   if (d.sources?.length) {
-    html += `<div class="card"><h2>Sources checked</h2><ul>${d.sources.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join('')}</ul></div>`;
+    h += `<section class="block"><h3>Sources checked</h3><ul>${d.sources.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join('')}</ul></section>`;
   }
-
-  $('rBody').innerHTML = html;
-  $('results').style.display = 'block';
+  $('rBody').innerHTML = h;
+  if (window.innerWidth <= 900) $('result').scrollIntoView({ behavior: 'smooth' });
 }
 
 function toMarkdown(d) {
-  const b = d.brief || {}, m = d.metrics;
-  const L = [`# SEO Brief: ${b.keyword}`, ''];
+  const b = d.brief || {}, m = d.metrics, meta = d.meta || {};
+  const L = [`# SEO Outline: ${b.keyword}`, ''];
+  L.push(`**Market:** ${meta.countryName} · **Language:** ${meta.languageName} · **Type:** ${meta.articleTypeName}`);
   L.push(`**Intent:** ${b.searchIntent} — ${b.intentExplanation}`, `**Audience:** ${b.targetAudience}`, `**Target length:** ${b.recommendedWordCount} words`);
-  if (m) L.push(`**Monthly searches:** ${m.searchVolume ?? '—'} · **Difficulty:** ${m.difficulty ?? '—'} · **CPC:** ${m.cpc ?? '—'}`);
+  if (m) L.push(`**Monthly searches:** ${m.searchVolume ?? '—'} · **Difficulty:** ${m.difficulty ?? '—'}`);
   L.push('', '## Title options', ...(b.titleOptions || []).map((t) => `- ${t}`));
   L.push('', `**Meta description:** ${b.metaDescription}`, `**Slug:** /${b.slug}`);
   L.push('', '## Keywords', `**Primary:** ${b.primaryKeyword}`, `**Secondary:** ${(b.secondaryKeywords || []).join(', ')}`);
   L.push('', '## Outline');
-  (b.outline || []).forEach((s) => { L.push(`### ${s.h2}`, `_${s.notes}_`); (s.h3 || []).forEach((h) => L.push(`- ${h}`)); L.push(''); });
+  (b.outline || []).forEach((s) => { L.push(`### ${s.h2}${s.wordCount ? ` (~${s.wordCount} words)` : ''}`, `_${s.notes}_`); (s.h3 || []).forEach((x) => L.push(`- ${x}`)); L.push(''); });
   L.push('## FAQs', ...(b.faqs || []).flatMap((f) => [`**${f.question}**`, f.answerHint, '']));
+  if (b.ctaPlacement) L.push('## Call to action', b.ctaPlacement, '');
   const sec = (t, a) => { if (a?.length) L.push(`## ${t}`, ...a.map((x) => `- ${x}`), ''); };
   sec('What top pages do well', b.competitorInsights);
   sec('Content gaps', b.contentGaps);
@@ -226,22 +363,23 @@ function toMarkdown(d) {
   if (d.sources?.length) sec('Sources', d.sources.map((s) => `[${s.title}](${s.url})`));
   return L.join('\n');
 }
-
 function download(name, text, type) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([text], { type }));
-  a.download = name;
-  a.click();
+  a.download = name; a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
-const fileBase = () => (last?.brief?.slug || 'seo-brief');
+const fileBase = () => last?.brief?.slug || 'seo-outline';
 
 $('form').addEventListener('submit', (e) => { e.preventDefault(); run(false); });
 $('refresh').addEventListener('click', () => run(true));
+$('demo').addEventListener('click', () => { fill(DEMO); $('messages').innerHTML = ''; });
+$('reset').addEventListener('click', () => {
+  fill(DEFAULTS); last = null; $('messages').innerHTML = ''; $('result').hidden = true; $('empty').hidden = false;
+});
 $('copyMd').addEventListener('click', async () => {
   if (!last) return;
-  try { await navigator.clipboard.writeText(toMarkdown(last)); $('copyMd').textContent = 'Copied ✓'; }
-  catch { $('copyMd').textContent = 'Copy failed'; }
+  try { await navigator.clipboard.writeText(toMarkdown(last)); $('copyMd').textContent = 'Copied ✓'; } catch { $('copyMd').textContent = 'Copy failed'; }
   setTimeout(() => ($('copyMd').textContent = 'Copy as Markdown'), 1500);
 });
 $('dlMd').addEventListener('click', () => last && download(`${fileBase()}.md`, toMarkdown(last), 'text/markdown'));
