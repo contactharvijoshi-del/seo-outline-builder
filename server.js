@@ -117,6 +117,7 @@ function normalize(body) {
     cta: text(body.cta, 120),
     competitorUrls: cleanUrls(body.competitorUrls),
     instructions: String(body.instructions ?? '').trim().slice(0, 1500),
+    research: CONFIG.useSearch && body.research !== false,
   };
 }
 
@@ -145,13 +146,13 @@ async function buildBrief(o) {
   if (s) s.status === 'fulfilled' ? (serp = s.value) : warnings.push(`SERP data unavailable: ${s.reason.message}`);
   if (m) m.status === 'fulfilled' ? (metrics = m.value) : warnings.push(`Keyword metrics unavailable: ${m.reason.message}`);
 
-  const prompt = buildPrompt({ ...o, serp, metrics, competitors, useSearch: CONFIG.useSearch });
+  const prompt = buildPrompt({ ...o, serp, metrics, competitors, useSearch: o.research });
   const ai = await generateBrief({
     apiKey: CONFIG.geminiKey,
     model: CONFIG.geminiModel,
     fallbackModel: CONFIG.fallbackModel,
     prompt,
-    useSearch: CONFIG.useSearch,
+    useSearch: o.research,
   });
   if (ai.model !== CONFIG.geminiModel) warnings.push(`${CONFIG.geminiModel} was busy, so the backup model ${ai.model} was used.`);
   return { ...ai, serp, metrics, competitors, warnings };
@@ -161,7 +162,7 @@ async function handleBrief(req, res) {
   const body = await readBody(req);
   const o = normalize(body);
 
-  const key = cache.key([o, CONFIG.geminiModel, CONFIG.mock, !!CONFIG.dfs, CONFIG.useSearch]);
+  const key = cache.key([o, CONFIG.geminiModel, CONFIG.mock, !!CONFIG.dfs]);
   if (!body.refresh) {
     const hit = await cache.get(key);
     if (hit) return send(res, 200, { ...hit, meta: { ...hit.meta, cached: true } });
@@ -178,7 +179,7 @@ async function handleBrief(req, res) {
       articleTypeName: ARTICLE_TYPES[o.articleType].label,
       lengthName: LENGTHS[o.length],
       model: result.model,
-      searchGrounding: CONFIG.useSearch && !CONFIG.mock,
+      searchGrounding: o.research && !CONFIG.mock,
       dataforseo: !!CONFIG.dfs && !CONFIG.mock,
       generatedAt: new Date().toISOString(),
       cached: false,

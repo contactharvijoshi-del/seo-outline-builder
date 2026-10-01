@@ -17,9 +17,39 @@
   }
   * { box-sizing: border-box; }
   body { margin: 0; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--ink); }
-  header { max-width: 1320px; margin: 0 auto; padding: 24px 16px 8px; }
-  header h1 { font-size: 24px; margin: 0; }
-  header p { margin: 4px 0 0; color: var(--muted); }
+  header.top { background: var(--card); border-bottom: 1px solid var(--line); }
+  .top-in { max-width: 1320px; margin: 0 auto; padding: 18px 16px 20px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+  .eyebrow b { color: var(--accent); letter-spacing: .06em; }
+  .eyebrow .sep { opacity: .5; }
+  .badge { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-line); border-radius: 99px; padding: 2px 10px; font-weight: 600; }
+  header.top h1 { font-size: 28px; letter-spacing: -.02em; margin: 6px 0 2px; }
+  header.top p { margin: 0; color: var(--muted); max-width: 720px; }
+  .top-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .seg { display: inline-flex; background: var(--card2); border: 1px solid var(--line); border-radius: 12px; padding: 4px; }
+  .seg button { font: inherit; font-weight: 600; border: 0; background: none; color: var(--muted); border-radius: 9px; padding: 8px 14px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .seg button:disabled { opacity: .45; cursor: not-allowed; }
+  .ghost { font: inherit; font-weight: 600; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 12px; padding: 9px 14px; cursor: pointer; }
+  .count { background: var(--accent-soft); color: var(--accent); border-radius: 99px; padding: 0 7px; font-size: 12px; }
+  .count:empty { display: none; }
+  dialog#projects { border: 1px solid var(--line); border-radius: 16px; background: var(--card); color: var(--ink); width: min(560px, calc(100vw - 32px)); max-height: 80vh; padding: 18px 20px; }
+  dialog::backdrop { background: rgba(10, 14, 22, .45); }
+  .dlg-head { display: flex; justify-content: space-between; align-items: center; }
+  .proj { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+  .proj button { font: inherit; font-size: 13px; }
+  .proj .open { background: none; border: 0; text-align: left; color: var(--ink); cursor: pointer; padding: 0; }
+  .proj .open b { display: block; }
+  .proj .del { border: 1px solid var(--line); background: var(--card); color: var(--err-ink); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
+  @media print {
+    header.top, .panel:first-child, .actions, #messages, .panel-head .pills, dialog { display: none !important; }
+    body { background: #fff; color: #000; }
+    main { display: block; padding: 0; }
+    .panel { border: 0 !important; border-radius: 0 !important; }
+    .panel-head { background: none !important; }
+    section.block { break-inside: avoid-page; }
+    a { color: #000; }
+  }
   main { max-width: 1320px; margin: 0 auto; padding: 16px 16px 64px; display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 20px; align-items: start; }
   @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
 
@@ -89,10 +119,28 @@
 </style>
 </head>
 <body>
-<header>
-  <h1>SEO Outline Builder</h1>
-  <p>Enter a target keyword and generate a complete, search-focused SEO content brief before a word is written.</p>
+<header class="top">
+  <div class="top-in">
+    <div>
+      <div class="eyebrow"><b>SEO &amp; RESEARCH AUTOMATION</b><span class="sep">•</span><span>SEO Metadata Generation</span><span class="badge">✦ AI-Powered SEO Research</span></div>
+      <h1>SEO Outline Builder</h1>
+      <p>Enter a target keyword and generate a complete search-focused SEO content brief before a word is written.</p>
+    </div>
+    <div class="top-actions">
+      <div class="seg" role="group" aria-label="Mode">
+        <button type="button" id="modeOutline" aria-pressed="false">AI Outline Mode</button>
+        <button type="button" id="modeResearch" aria-pressed="true">🔍 Research Mode</button>
+      </div>
+      <button type="button" class="ghost" id="projectsBtn">🗀 Projects <span id="projCount" class="count"></span></button>
+    </div>
+  </div>
 </header>
+
+<dialog id="projects">
+  <div class="dlg-head"><b>Saved projects</b><button type="button" class="ghost" id="projClose" aria-label="Close">✕</button></div>
+  <p class="notes">Every outline you build is saved here, in this browser only.</p>
+  <div id="projList"></div>
+</dialog>
 
 <main>
   <!-- ===== Brief form ===== -->
@@ -178,6 +226,8 @@
         <div class="actions">
           <button id="copyMd" type="button">Copy as Markdown</button>
           <button id="dlMd" type="button">Download .md</button>
+          <button id="dlDocx" type="button">Download Word</button>
+          <button id="dlPdf" type="button">Download PDF</button>
           <button id="dlJson" type="button">Download JSON</button>
           <button id="refresh" type="button" title="Ignore cache and regenerate">Regenerate</button>
         </div>
@@ -208,6 +258,9 @@ const DEMO = {
   competitors: '', instructions: 'Focus on beginners and keep the article practical. Include a budget vs premium section and Australian pricing.',
 };
 let articleType = 'ultimate';
+let research = true;
+let cfgGrounding = false;
+let cfgMock = false;
 let authRequired = false;
 let last = null;
 
@@ -234,18 +287,61 @@ async function init() {
 
   authRequired = cfg.authRequired;
   if (authRequired) { $('tokenWrap').style.display = 'block'; $('token').value = load('token') || ''; }
-  $('research').className = 'research' + (cfg.searchGrounding ? '' : ' off');
-  $('research').innerHTML = cfg.mock
-    ? '<b>Demo Mode:</b> sample outlines only — no AI is used.'
-    : cfg.searchGrounding
-      ? '✦ <b>Research Mode Enabled:</b> live Google Search grounding will be applied to incorporate authoritative topics and current terminology.'
-      : '<b>Research Mode Off:</b> outlines use the AI model’s own knowledge (live search grounding is turned off on the server).';
+  cfgGrounding = cfg.searchGrounding; cfgMock = cfg.mock;
+  const saved = load('mode');
+  setMode(cfgGrounding && saved !== 'outline');
+  if (!cfgGrounding) { $('modeResearch').disabled = true; $('modeResearch').title = 'Live search is turned off on the server'; }
+  renderProjects();
   $('pills').innerHTML = [
     `<span class="pill on">AI: ${esc(cfg.model)}</span>`,
     `<span class="pill ${cfg.searchGrounding ? 'on' : ''}">Live search ${cfg.searchGrounding ? 'on' : 'off'}</span>`,
     `<span class="pill ${cfg.dataforseo ? 'on' : ''}">DataForSEO ${cfg.dataforseo ? 'on' : 'off'}</span>`,
   ].join('');
 }
+
+function setMode(r) {
+  research = r && cfgGrounding;
+  $('modeResearch').setAttribute('aria-pressed', String(research));
+  $('modeOutline').setAttribute('aria-pressed', String(!research));
+  $('research').className = 'research' + (research ? '' : ' off');
+  $('research').innerHTML = cfgMock
+    ? '<b>Demo Mode:</b> sample outlines only — no AI is used.'
+    : research
+      ? '✦ <b>Research Mode Enabled:</b> live search grounding will be applied to incorporate authoritative topics and current terminology.'
+      : cfgGrounding
+        ? '<b>AI Outline Mode:</b> faster outlines from the AI model’s own knowledge, without live search.'
+        : '<b>AI Outline Mode:</b> outlines use the AI model’s own knowledge (live search is turned off on the server).';
+}
+$('modeResearch').addEventListener('click', () => { setMode(true); store('mode', 'research'); });
+$('modeOutline').addEventListener('click', () => { setMode(false); store('mode', 'outline'); });
+
+// ---- Projects (saved in this browser) ----
+function getProjects() { try { return JSON.parse(load('projects') || '[]'); } catch { return []; } }
+function saveProjects(list) { try { localStorage.setItem('projects', JSON.stringify(list)); } catch { list.pop(); if (list.length) saveProjects(list); } }
+function addProject(d) {
+  const list = getProjects().filter((p) => !(p.keyword === d.meta.keyword && p.generatedAt === d.meta.generatedAt));
+  list.unshift({ id: Date.now(), keyword: d.meta.keyword, type: d.meta.articleTypeName, market: d.meta.countryName, generatedAt: d.meta.generatedAt, data: d });
+  saveProjects(list.slice(0, 30));
+  renderProjects();
+}
+function renderProjects() {
+  const list = getProjects();
+  $('projCount').textContent = list.length || '';
+  $('projList').innerHTML = list.length ? list.map((p) => `<div class="proj">
+      <button type="button" class="open" data-id="${p.id}"><b>${esc(p.keyword)}</b><span class="notes">${esc(p.type)} · ${esc(p.market)} · ${new Date(p.generatedAt).toLocaleString()}</span></button>
+      <button type="button" class="del" data-del="${p.id}">Delete</button></div>`).join('')
+    : '<p class="notes">No saved projects yet — build an outline and it will appear here.</p>';
+}
+$('projectsBtn').addEventListener('click', () => { renderProjects(); $('projects').showModal(); });
+$('projClose').addEventListener('click', () => $('projects').close());
+$('projList').addEventListener('click', (e) => {
+  const open = e.target.closest('[data-id]'), del = e.target.closest('[data-del]');
+  if (del) { saveProjects(getProjects().filter((p) => String(p.id) !== del.dataset.del)); renderProjects(); }
+  if (open) {
+    const p = getProjects().find((x) => String(x.id) === open.dataset.id);
+    if (p) { last = p.data; $('messages').innerHTML = ''; render(p.data); $('projects').close(); }
+  }
+});
 
 function showMsg(kind, text) { $('messages').insertAdjacentHTML('beforeend', `<div class="notice ${kind}">${esc(text)}</div>`); }
 
@@ -265,13 +361,14 @@ async function run(refresh = false) {
         keyword, country: $('country').value, language: $('language').value, audience: $('audience').value,
         intent: $('intent').value, articleType, length: $('length').value, h2Count: Number($('h2Count').value),
         brand: $('brand').value, cta: $('cta').value, competitorUrls: $('competitors').value,
-        instructions: $('instructions').value, refresh,
+        instructions: $('instructions').value, research, refresh,
       }),
     });
     let data;
     try { data = await res.json(); } catch { throw new Error(`The server took too long or failed (${res.status}). Please try again.`); }
     if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
     last = data;
+    addProject(data);
     (data.warnings || []).forEach((w) => showMsg('warn', w));
     render(data);
   } catch (e) {
@@ -371,6 +468,80 @@ function download(name, text, type) {
 }
 const fileBase = () => last?.brief?.slug || 'seo-outline';
 
+// ---- Word (.docx) export — built in the browser, no external libraries ----
+const CRC_T = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+const crc32 = (b) => { let c = 0xffffffff; for (let i = 0; i < b.length; i++) c = CRC_T[(c ^ b[i]) & 0xff] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+function zip(files) { // store-only ZIP
+  const enc = new TextEncoder(), parts = [], central = []; let offset = 0;
+  for (const [name, text] of files) {
+    const n = enc.encode(name), d = enc.encode(text), crc = crc32(d);
+    const h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true);
+    h.setUint32(14, crc, true); h.setUint32(18, d.length, true); h.setUint32(22, d.length, true); h.setUint16(26, n.length, true);
+    parts.push(new Uint8Array(h.buffer), n, d);
+    const c = new DataView(new ArrayBuffer(46));
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true);
+    c.setUint32(16, crc, true); c.setUint32(20, d.length, true); c.setUint32(24, d.length, true); c.setUint16(28, n.length, true); c.setUint32(42, offset, true);
+    central.push(new Uint8Array(c.buffer), n);
+    offset += 30 + n.length + d.length;
+  }
+  const size = central.reduce((a, b) => a + b.length, 0);
+  const e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, size, true); e.setUint32(16, offset, true);
+  return new Blob([...parts, ...central, new Uint8Array(e.buffer)], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+}
+function toDocx(d) {
+  const b = d.brief || {}, m = d.metrics, meta = d.meta || {};
+  const x = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '');
+  const run = (t, o = {}) => `<w:r>${o.b || o.i || o.c ? `<w:rPr>${o.b ? '<w:b/>' : ''}${o.i ? '<w:i/>' : ''}${o.c ? `<w:color w:val="${o.c}"/>` : ''}</w:rPr>` : ''}<w:t xml:space="preserve">${x(t)}</w:t></w:r>`;
+  const P = (runs, style, ind) => `<w:p>${style || ind ? `<w:pPr>${style ? `<w:pStyle w:val="${style}"/>` : ''}${ind ? `<w:ind w:left="${ind}" w:hanging="240"/>` : ''}</w:pPr>` : ''}${runs}</w:p>`;
+  const p = (t, style) => P(run(t), style);
+  const kv = (k, v) => P(run(k + ': ', { b: 1 }) + run(v));
+  const bullet = (t, lvl = 1) => P(run('•  ' + t), null, 360 * lvl);
+  const out = [];
+  out.push(p(`SEO Outline: ${b.keyword}`, 'Title'));
+  out.push(P(run([meta.countryName, meta.languageName, meta.articleTypeName, meta.lengthName].filter(Boolean).join(' · '), { c: '64707F' })));
+  out.push(p('Overview', 'Heading1'));
+  out.push(kv('Search intent', `${b.searchIntent || ''} — ${b.intentExplanation || ''}`));
+  out.push(kv('Target audience', b.targetAudience));
+  out.push(kv('Target length', `${b.recommendedWordCount} words`));
+  if (m) out.push(kv('Keyword data', `${m.searchVolume ?? '—'} monthly searches · difficulty ${m.difficulty ?? '—'}`));
+  out.push(p('Title & meta', 'Heading1'));
+  out.push(P(run('Title options', { b: 1 }))); (b.titleOptions || []).forEach((t) => out.push(bullet(t)));
+  out.push(kv('Meta description', b.metaDescription));
+  out.push(kv('URL slug', '/' + (b.slug || '')));
+  out.push(p('Keywords', 'Heading1'));
+  out.push(kv('Primary', b.primaryKeyword));
+  out.push(kv('Secondary', (b.secondaryKeywords || []).join(', ')));
+  out.push(p('Outline', 'Heading1'));
+  (b.outline || []).forEach((s, i) => {
+    out.push(p(`H2 ${i + 1}: ${s.h2}${s.wordCount ? ` (~${s.wordCount} words)` : ''}`, 'Heading2'));
+    if (s.notes) out.push(P(run(s.notes, { i: 1, c: '64707F' })));
+    (s.h3 || []).forEach((h) => out.push(bullet('H3: ' + h)));
+  });
+  out.push(p('FAQs', 'Heading1'));
+  (b.faqs || []).forEach((f) => { out.push(P(run(f.question, { b: 1 }))); out.push(p(f.answerHint)); });
+  if (b.ctaPlacement) { out.push(p('Call to action', 'Heading1')); out.push(p(b.ctaPlacement)); }
+  const sec = (t, a) => { if (a?.length) { out.push(p(t, 'Heading1')); a.forEach((v) => out.push(bullet(v))); } };
+  sec('What top pages do well', b.competitorInsights);
+  sec('Content gaps to win on', b.contentGaps);
+  sec('Internal link ideas', b.internalLinkIdeas);
+  sec('Schema markup', b.schemaTypes);
+  if (b.writerNotes) { out.push(p('Notes for the writer', 'Heading1')); out.push(p(b.writerNotes)); }
+  sec('Sources checked', (d.sources || []).map((s) => `${s.title} — ${s.url}`));
+
+  const doc = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${out.join('')}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>`;
+  const st = (id, name, sz, color, extra = '') => `<w:style w:type="paragraph" w:styleId="${id}"><w:name w:val="${name}"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:qFormat/><w:pPr><w:keepNext/><w:spacing w:before="240" w:after="80"/>${extra}</w:pPr><w:rPr><w:b/><w:color w:val="${color}"/><w:sz w:val="${sz}"/></w:rPr></w:style>`;
+  const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:eastAsia="Calibri" w:cs="Calibri"/><w:sz w:val="22"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="100" w:line="276" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style>${st('Title', 'Title', 40, '1A1D23', '<w:outlineLvl w:val="0"/>')}${st('Heading1', 'heading 1', 30, '2563EB', '<w:outlineLvl w:val="0"/>')}${st('Heading2', 'heading 2', 25, '1A1D23', '<w:outlineLvl w:val="1"/>')}</w:styles>`;
+  return zip([
+    ['[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>'],
+    ['_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'],
+    ['word/_rels/document.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'],
+    ['word/document.xml', doc],
+    ['word/styles.xml', styles],
+  ]);
+}
+
 $('form').addEventListener('submit', (e) => { e.preventDefault(); run(false); });
 $('refresh').addEventListener('click', () => run(true));
 $('demo').addEventListener('click', () => { fill(DEMO); $('messages').innerHTML = ''; });
@@ -383,6 +554,15 @@ $('copyMd').addEventListener('click', async () => {
   setTimeout(() => ($('copyMd').textContent = 'Copy as Markdown'), 1500);
 });
 $('dlMd').addEventListener('click', () => last && download(`${fileBase()}.md`, toMarkdown(last), 'text/markdown'));
+$('dlDocx').addEventListener('click', () => {
+  if (!last) return;
+  const a = document.createElement('a'); a.href = URL.createObjectURL(toDocx(last)); a.download = `${fileBase()}.docx`; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+$('dlPdf').addEventListener('click', () => {
+  if (!last) return;
+  const t = document.title; document.title = fileBase(); window.print(); document.title = t;
+});
 $('dlJson').addEventListener('click', () => last && download(`${fileBase()}.json`, JSON.stringify(last, null, 2), 'application/json'));
 init();
 </script>
